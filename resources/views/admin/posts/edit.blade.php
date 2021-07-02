@@ -8,6 +8,16 @@
 
   <h1>{{$post->title}}</h1>
 
+  @if ($errors->any())
+      <div class="alert alert-danger">
+        <ul>
+          @foreach ($errors->all() as $error)
+            <li>{{$error}}</li>
+          @endforeach
+        </ul>
+      </div>
+    @endif
+
   <form action="{{route('admin.posts.update', $post)}}" method="POST">
 
     @method('patch')
@@ -15,12 +25,18 @@
 
     <div class="mb-3">
       <label for="title" class="label-control">Title:</label>
-      <input type="text" name="title" id="title" value="{{$post->title}}" class="form-control">
+      <input class="form-control @error('title') is-invalid @enderror" type="text" name="title" id="title" value="{{old('title',$post->title)}}">
+          @error('title')
+            <div class="text-danger">{{$message}}</div>
+          @enderror
     </div>
 
     <div class="mb-3">
       <label for="content" class="label-control">Content:</label>
-      <textarea name="content" id="content" rows="4" class="form-control">{{$post->content}}</textarea>
+      <textarea class="form-control  @error('content') is-invalid @enderror" type="text" name="content" id="content" rows="5">{{old('content',$post->content)}}</textarea>
+      @error('content')
+        <div class="text-danger">{{$message}}</div>
+      @enderror
     </div>
 
     <button type="submit" class="btn btn-primary">SUBMIT</button>
