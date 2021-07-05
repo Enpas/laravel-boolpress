@@ -35,6 +35,19 @@
       </div>
 
       <div class="mb-3">
+        <label for="category_id" class="label-control">Category:</label>
+        <select name="category_id" id="category_id" class="form-control @error('category_id') is-invalid @enderror">
+          <option value="">Select a category</option>
+          @foreach ($categories as $category)
+            <option value="{{$category->id}}">{{$category->name}}</option>
+          @endforeach
+        </select>
+        @error('category_id')
+        <span class="invalid-feedback">{{$message}}</span>
+      @enderror
+      </div>
+
+      <div class="mb-3">
         <label for="content" class="label-control">Content:</label>
         <textarea class="form-control @error('content') is-invalid @enderror" type="text" name="content" id="content" rows="5">{{old('content')}}</textarea>
           @error('content')
