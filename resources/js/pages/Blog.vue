@@ -1,28 +1,38 @@
 <template>
 
   <main class="container mt-4">
+
     <h1>My Blog</h1>
+    
     <div 
-      class="card mb-4"
-      v-for="post in posts" :key="'p'+post.id"
+     v-if="!loaded"
+     class="loader-container"
     >
-      <div class="card-body">
-        <h4 class="card-title">Title: {{post.title}}</h4>
-        <h6 class="card-title">Category: {{post.category}}</h6>
-        <h6 class="card-title">Date: {{formatDate(post.date)}}</h6>
-        <p class="card-text">Content: {{post.content}}</p>
-        <a href="#" class="btn btn-primary">Go..</a>
-      </div>
+      <Loader />
+    </div>
+
+    <div 
+      class="card-container"
+      v-else
+    >
+      <Card 
+        :title="post.title"
+        v-for="post in posts" :key="'p'+post.id"
+        :category="post.category"
+        :date="post.date"
+        :content="post.content"
+        :slug="post.slug"
+      />
     </div>
 
     <nav aria-label="Page navigation example">
       <ul class="pagination">
         <li 
           class="page-item"
+          :class="{'disabled': pagination.current === 1}"
         >
             <button 
               class="page-link"
-              :class="{'disabled': pagination.current === 1}"
               @click="getPosts(pagination.current - 1)"
             >Previous
             </button>
@@ -42,10 +52,10 @@
 
         <li 
           class="page-item"
+          :class="{'disabled': pagination.current === pagination.last}"
         >
             <button 
               class="page-link"
-              :class="{'disabled': pagination.current === pagination.last}"
               @click="getPosts(pagination.current + 1)"
             >Next
             </button>
@@ -59,18 +69,26 @@
 
 <script>
 import axios from 'axios';
+import Loader from '../components/Loader.vue'
+import Card from '../components/Card.vue'
 
 export default {
   name: 'Blog',
+  components: {
+    Loader,
+    Card
+  },
   data() {
     return {
       posts: [],
-      pagination: {}
+      pagination: {},
+      loaded: false
     }
   },
 
   methods: {
     getPosts(page = 1) {
+      this.loaded = false;
       axios.get('http://127.0.0.1:8000/api/posts', {
         params: {
           page: page
@@ -82,21 +100,14 @@ export default {
             current: res.data.current_page,
             last: res.data.last_page
           }
+          this.loaded = true;
         })
         .catch(err => {
           console.log(err);
         });
+        
     },
 
-    formatDate(date) {
-    const d = new Date(date);
-    let day = d.getDate();
-    let month = d.getMonth() + 1;
-    const year = d.getFullYear();
-    if (day < 10) day = '0' + day;
-    if (month < 10) month = '0' + month;
-    return `${day}/${month}/${year}`
-    }
   },
 
   created() {
